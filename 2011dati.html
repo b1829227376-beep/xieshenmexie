@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>>Æ\˚ﬂIÔ˛¬p§íˇ</title>
+    <style>
+        :root {
+          --bg: #090d16;
+          --card-bg: #131b2e;
+          --border: #23314f;
+          --accent: #38bdf8;
+          --accent-green: #4ade80;
+          --accent-amber: #fbbf24;
+          --accent-red: #f87171;
+          --text: #e2e8f0;
+          --text-dim: #94a3b8;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          background: var(--bg);
+          color: var(--text);
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        
+        .main-wrap {
+          width: 100%;
+          max-width: 1400px;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        
+        header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px 16px;
+          background: var(--card-bg);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+        }
+        
+        h1 {
+          font-size: 18px;
+          font-weight: 600;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        
+        .mode-switch {
+          display: flex;
+          gap: 8px;
+          background: #0b1120;
+          padding: 4px;
+          border-radius: 6px;
+          border: 1px solid var(--border);
+        }
+        
+        .btn-mode {
+          background: transparent;
+          border: none;
+          color: var(--text-dim);
+          padding: 6px 12px;
+          font-size: 13px;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        
+        .btn-mode.active {
+          background: var(--accent);
+          color: #0b1120;
+          font-weight: 600;
+        }
+        
+        /* IÔ;: */
+        .canvas-box {
+          position: relative;
+          background: #040711;
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+        
+        canvas {
+          display: block;
+          width: 100%;
+          height: 480px;
+        }
+        
+        .legend-bar {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          background: rgba(19, 27, 46, 0.85);
+          backdrop-filter: blur(4px);
+          padding: 8px 12px;
+          border-radius: 6px;
+          border: 1px solid var(--border);
+          font-size: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          pointer-events: none;
+        }
+        
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-line { width: 18px; height: 3px; border-radius: 2px; }
+        
+        /* ß6bh< */
+        .bottom-grid {
+          display: grid;
+          grid-template-columns: 360px 1fr;
+          gap: 16px;
+        }
+        
+        @media (max-width: 960px) {
+          .bottom-grid { grid-template-columns: 1fr; }
+        }
+        
+        .controls-panel {
+          background: var(--card-bg);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        
+        .ctrl-row {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        
+        .ctrl-header {
+          display: flex;
+          justify-content: space-between;
+          font-size: 13px;
+          color: var(--text-dim);
+        }
+        
+        .ctrl-val {
+          font-family: monospace;
+          font-weight: bold;
+          color: var(--accent);
+        }
+        
+        input[type=range] {
+          -webkit-appearance: none;
+          width: 100%;
+          height: 4px;
+          background: #23314f;
+          border-radius: 2px;
+          outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          background: var(--accent);
+          cursor: pointer;
+        }
+        
+        /* òÓh<H∞ */
+        .table-panel {
+          background: var(--card-bg);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+        
+        .table-title {
+          font-size: 14px;
+          font-weight: 600;
+          margin-bottom: 8px;
+          color: var(--text-dim);
+          display: flex;
+          justify-content: space-between;
+        }
+        
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          text-align: center;
+          font-size: 13px;
+          background: #090e1a;
+          border-radius: 6px;
+          overflow: hidden;
+        }
+        
+        th, td {
+          border: 1px solid var(--border);
+          padding: 10px 4px;
+        }
+        
+        th {
+          background: #17233c;
+          color: var(--text-dim);
+          font-weight: normal;
+        }
+        
+        td {
+          font-family: monospace;
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--accent-green);
+        }
+        
+        .tag-hint {
+          font-size: 12px;
+          color: var(--accent-amber);
+          margin-top: 10px;
+          line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-wrap">
+        <header>
+            <h1>>Æ\If˚ﬂIÔ˛ (Ray Tracing)</h1>
+            <div class="mode-switch">
+                <button class="btn-mode active" id="btnModeInf">c8<¬ﬂ (œ(‡w‹)</button>
+                <button class="btn-mode" id="btnModeProj">3m ïqûœ!</button>
+            </div>
+        </header>
+
+        <!-- Canvas IÔ˛ -->
+        <div class="canvas-box">
+            <canvas id="opticsCanvas"></canvas>
+            <div class="legend-bar">
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #f87171;"></div>
+                    <span>TÑπIø (Marginal Ray)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #38bdf8;"></div>
+                    <span>∆:;Iø (Chief Ray)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #fbbf24; border-top: 1px dashed #fbbf24;"></div>
+                    <span>π∆:‹ (Envelope)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #4ade80;"></div>
+                    <span>˙≥sb (Exit Pupil)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ë§íbTòaeh -->
+        <div class="bottom-grid">
+            <!-- ¬pÇb -->
+            <div class="controls-panel">
+                <div class="ctrl-row">
+                    <div class="ctrl-header">
+                        <span>qm› L (mm)</span>
+                        <span class="ctrl-val" id="disp_L">195</span>
+                    </div>
+                    <input type="range" id="sl_L" min="160" max="240" step="1" value="195">
+                </div>
+
+                <div class="ctrl-row">
+                    <div class="ctrl-header">
+                        <span>i\>'á |≤í| (◊)</span>
+                        <span class="ctrl-val" id="disp_beta">10</span>
+                    </div>
+                    <input type="range" id="sl_beta" min="4" max="25" step="1" value="10">
+                </div>
+
+                <div class="ctrl-row">
+                    <div class="ctrl-header">
+                        <span>iπp<TÑ NA</span>
+                        <span class="ctrl-val" id="disp_na">0.25</span>
+                    </div>
+                    <input type="range" id="sl_na" min="0.10" max="0.45" step="0.01" value="0.25">
+                </div>
+
+                <div class="ctrl-row">
+                    <div class="ctrl-header">
+                        <span>∆:IÙÑ (mm)</span>
+                        <span class="ctrl-val" id="disp_dfield">16.0</span>
+                    </div>
+                    <input type="range" id="sl_dfield" min="10" max="22" step="0.5" value="16.0">
+                </div>
+
+                <div class="ctrl-row">
+                    <div class="ctrl-header">
+                        <span>Ó\∆…á ìë (◊)</span>
+                        <span class="ctrl-val" id="disp_gamma">10</span>
+                    </div>
+                    <input type="range" id="sl_gamma" min="5" max="20" step="1" value="10">
+                </div>
+            </div>
+
+            <!-- ˘îüòÓÑh<Ù•kô”ú -->
+            <div class="table-panel">
+                <div>
+                    <div class="table-title">
+                        <span>òÓÅBkôh<¬pûˆ–ó<</span>
+                        <span style="color: var(--accent); font-family: monospace;">qm› = 195mm | 10◊ i\ | 10◊ Ó\</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>fí'</th>
+                                <th>Dí</th>
+                                <th>fë'</th>
+                                <th>Dë</th>
+                                <th>lö'</th>
+                                <th>Dö'</th>
+                                <th>lí</th>
+                                <th>Ó\˚®›ª</th>
+                                <th>g˚ﬂ J</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="td_fo">16.12 mm</td>
+                                <td id="td_Do">9.15 mm</td>
+                                <td id="td_fe">25.00 mm</td>
+                                <td id="td_De">19.55 mm</td>
+                                <td id="td_lp">28.53 mm</td>
+                                <td id="td_Dp">1.29 mm</td>
+                                <td id="td_lo">-17.73 mm</td>
+                                <td id="td_shift">+0.21 mm</td>
+                                <td id="td_J">0.20 mm</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tag-hint" id="hintBox">
+                    œ SM:<strong>c8<¬ﬂ!</strong>-Ùœ∆:I	Ó\iπ&πÕ˙I:sLI<br>
+                    œ π˚
+πb0<strong>3m ïq!</strong>Ô¬ﬂÓ\œπÆ +0.21mmv( 3 sbZ&π
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('opticsCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // ß6C 
+        const sl_L = document.getElementById('sl_L');
+        const sl_beta = document.getElementById('sl_beta');
+        const sl_na = document.getElementById('sl_na');
+        const sl_dfield = document.getElementById('sl_dfield');
+        const sl_gamma = document.getElementById('sl_gamma');
+        
+        const disp_L = document.getElementById('disp_L');
+        const disp_beta = document.getElementById('disp_beta');
+        const disp_na = document.getElementById('disp_na');
+        const disp_dfield = document.getElementById('disp_dfield');
+        const disp_gamma = document.getElementById('disp_gamma');
+        
+        const btnModeInf = document.getElementById('btnModeInf');
+        const btnModeProj = document.getElementById('btnModeProj');
+        const hintBox = document.getElementById('hintBox');
+        
+        // h<UC<
+        const td_fo = document.getElementById('td_fo');
+        const td_Do = document.getElementById('td_Do');
+        const td_fe = document.getElementById('td_fe');
+        const td_De = document.getElementById('td_De');
+        const td_lp = document.getElementById('td_lp');
+        const td_Dp = document.getElementById('td_Dp');
+        const td_lo = document.getElementById('td_lo');
+        const td_shift = document.getElementById('td_shift');
+        const td_J = document.getElementById('td_J');
+        
+        let isProjectionMode = false;
+        
+        btnModeInf.onclick = () => {
+          isProjectionMode = false;
+          btnModeInf.classList.add('active');
+          btnModeProj.classList.remove('active');
+          hintBox.innerHTML = `œ SM:<strong>c8<¬ﬂ!</strong>-ÙœÓ\M&πÕœÓ\˙:sL;Iø_`;
+          render();
+        };
+        
+        btnModeProj.onclick = () => {
+          isProjectionMode = true;
+          btnModeProj.classList.add('active');
+          btnModeInf.classList.remove('active');
+          hintBox.innerHTML = `œ SM:<strong>3m ïqûœ!</strong>Ó\œπ‹ª	˚® <strong>+0.21 mm</strong>˙Iø(œπ 3000mm GZûœ`;
+          render();
+        };
+        
+        function update() {
+          disp_L.innerText = sl_L.value;
+          disp_beta.innerText = sl_beta.value;
+          disp_na.innerText = parseFloat(sl_na.value).toFixed(2);
+          disp_dfield.innerText = parseFloat(sl_dfield.value).toFixed(1);
+          disp_gamma.innerText = sl_gamma.value;
+          render();
+        }
+        
+        [sl_L, sl_beta, sl_na, sl_dfield, sl_gamma].forEach(el => el.oninput = update);
+        
+        function resizeCanvas() {
+          const dpr = window.devicePixelRatio || 1;
+          const rect = canvas.getBoundingClientRect();
+          canvas.width = rect.width * dpr;
+          canvas.height = rect.height * dpr;
+          ctx.scale(dpr, dpr);
+        }
+        
+        window.addEventListener('resize', () => { resizeCanvas(); render(); });
+        
+        function render() {
+          const w = canvas.getBoundingClientRect().width;
+          const h = canvas.getBoundingClientRect().height;
+          ctx.clearRect(0, 0, w, h);
+        
+          // ∑÷SM°ó¬p
+          const L = parseFloat(sl_L.value);
+          const beta = parseFloat(sl_beta.value);
+          const na = parseFloat(sl_na.value);
+          const D_field = parseFloat(sl_dfield.value);
+          const gamma = parseFloat(sl_gamma.value);
+        
+          // 1. i\°ó
+          const lo = - L / (beta + 1);
+          const lo_prime = beta * Math.abs(lo);
+          const fo_prime = (L * beta) / Math.pow(beta + 1, 2);
+        
+          const sin_uo = na;
+          const tan_uo = sin_uo / Math.sqrt(Math.max(0.001, 1 - sin_uo * sin_uo));
+          const Do = 2 * Math.abs(lo) * tan_uo;
+        
+          // 2. ∆:∆:I
+          const y_prime = D_field / 2;
+          const y = y_prime / beta;
+        
+          // 3. Ó\˙≥°ó
+          const fe_prime = 250 / gamma;
+          const d_sep = lo_prime + fe_prime; // c8!Ù›
+          const lp2 = -d_sep;
+          const lp_prime = (fe_prime * lp2) / (lp2 + fe_prime);
+          const beta_p = Math.abs(lp_prime / lp2);
+          const Dp_prime = beta_p * Do;
+        
+          // 4. ‡UI„Ñ De
+          const ype = y_prime * (1 + fe_prime / lo_prime);
+          const yme = Dp_prime / 2;
+          const De = 2 * (ype + yme);
+        
+          // 5. 3m ïq!M˚
+          const le_proj_prime = 3000; // 3m = 3000mm
+          const le_proj = (le_proj_prime * fe_prime) / (fe_prime - le_proj_prime); // ¶ -25.21mm
+          const delta_eye = Math.abs(le_proj) - fe_prime; // c<h:œπ˚®
+        
+          // 6. g˚ﬂ…ÿœ
+          const lagrange_J = y * na;
+        
+          // Ù∞h<
+          td_fo.innerText = fo_prime.toFixed(2) + " mm";
+          td_Do.innerText = Do.toFixed(2) + " mm";
+          td_fe.innerText = fe_prime.toFixed(2) + " mm";
+          td_De.innerText = De.toFixed(2) + " mm";
+          td_lp.innerText = lp_prime.toFixed(2) + " mm";
+          td_Dp.innerText = Dp_prime.toFixed(2) + " mm";
+          td_lo.innerText = lo.toFixed(2) + " mm";
+          td_shift.innerText = (delta_eye >= 0 ? "+" : "") + delta_eye.toFixed(2) + " mm";
+          td_J.innerText = lagrange_J.toFixed(2) + " mm";
+        
+          // ================= IÔÿ6 =================
+          const cy = h / 2;
+        
+          // ‡U@‘ã°ó
+          const totalPhysicalDist = Math.abs(lo) + lo_prime + fe_prime + lp_prime + 40;
+          const scaleX = (w - 180) / totalPhysicalDist;
+          const scaleY = 7.0;
+        
+          const x_start = 70;
+          const x_obj = x_start;
+          const x_lens1 = x_obj + Math.abs(lo) * scaleX;
+          const x_field_stop = x_lens1 + lo_prime * scaleX;
+        
+          // Ó\MnÂ / 3m ïqÛÆO˚S∞i˚®	
+          const visualShiftPx = isProjectionMode ? Math.max(12, delta_eye * scaleX * 8) : 0;
+          const x_lens2 = x_field_stop + fe_prime * scaleX + visualShiftPx;
+          const x_pupil = x_lens2 + lp_prime * scaleX;
+          const x_proj_end = w - 25;
+        
+          // ÿ6˙∆It
+          ctx.strokeStyle = '#23314f';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([8, 4]);
+          ctx.beginPath();
+          ctx.moveTo(20, cy);
+          ctx.lineTo(w - 20, cy);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        
+          // 1. ÿ6iπiÿ
+          const h_obj = y * scaleY;
+          drawArrow(ctx, x_obj, cy, x_obj, cy - h_obj, '#38bdf8', 2);
+          drawText(ctx, `i 2y=${(y*2).toFixed(2)}`, x_obj, cy + 24, '#38bdf8', 'center');
+        
+          // 2. ÿ6i\ LÅ (TÑI)
+          const h_lens1 = Math.max(Do * scaleY * 0.9, 45);
+          drawLens(ctx, x_lens1, cy, h_lens1, `i\ LÅ (TÑI)\nDo=${Do.toFixed(2)}`);
+        
+          // 3. ÿ6∆:I-ÙÀûœ
+          const h_img = y_prime * scaleY;
+          ctx.strokeStyle = '#fbbf24';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(x_field_stop, cy - 80);
+          ctx.lineTo(x_field_stop, cy - h_img);
+          ctx.moveTo(x_field_stop, cy + h_img);
+          ctx.lineTo(x_field_stop, cy + 80);
+          ctx.stroke();
+          // Àûœ≠4
+          drawArrow(ctx, x_field_stop, cy, x_field_stop, cy + h_img, '#fbbf24', 2);
+          drawText(ctx, `∆:I 16mm`, x_field_stop, cy - 88, '#fbbf24', 'center');
+        
+          // 4. ÿ6Ó\ LÇ
+          const h_lens2 = Math.max(De * scaleY * 0.65, 75);
+          const shiftLabel = isProjectionMode ? `Ó\ LÇ (+${delta_eye.toFixed(2)}mm)` : `Ó\ LÇ (fë'=${fe_prime.toFixed(1)})`;
+          drawLens(ctx, x_lens2, cy, h_lens2, shiftLabel);
+        
+          // 5. ÿ6˙≥b
+          const h_pupil = Math.max(Dp_prime * scaleY, 10);
+          ctx.strokeStyle = '#4ade80';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(x_pupil, cy - h_pupil);
+          ctx.lineTo(x_pupil, cy + h_pupil);
+          ctx.stroke();
+          drawText(ctx, `˙≥ Dp'=${Dp_prime.toFixed(2)}`, x_pupil, cy + 46, '#4ade80', 'center');
+        
+          // 6. Iø˝˘
+          // A. t
+iππIø (Marginal Ray) - ¢rJI_
+          const r1 = (Do / 2) * scaleY;
+          const r_pupil = (Dp_prime / 2) * scaleY;
+        
+          ctx.strokeStyle = '#f87171';
+          ctx.lineWidth = 1.4;
+          ctx.fillStyle = 'rgba(248, 113, 113, 0.08)';
+        
+          // 
+πIøﬁÔkE
+          ctx.beginPath();
+          ctx.moveTo(x_obj, cy);
+          ctx.lineTo(x_lens1, cy - r1);
+          ctx.lineTo(x_field_stop, cy);
+          ctx.lineTo(x_lens2, cy - r_pupil);
+          if (!isProjectionMode) {
+            // sLI˙
+            ctx.lineTo(x_proj_end, cy - r_pupil);
+            ctx.lineTo(x_proj_end, cy + r_pupil);
+          } else {
+            // GZI˙ (( 3m ûœbGZ)
+            ctx.lineTo(x_proj_end, cy - r_pupil * 0.2);
+            ctx.lineTo(x_proj_end, cy + r_pupil * 0.2);
+          }
+          ctx.lineTo(x_lens2, cy + r_pupil);
+          ctx.lineTo(x_field_stop, cy);
+          ctx.lineTo(x_lens1, cy + r1);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        
+          // B. π∆:;Iø (Chief Ray) - Æ›r
+          // ŒiÿÔ -> i\I√(TÑI-√) -> ∆:Iπ -> Ó\ -> ˙≥-√
+          const y_lens2_chief = cy + (h_img * (1 + (fe_prime + (isProjectionMode ? delta_eye : 0)) / lo_prime));
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(x_obj, cy - h_obj);
+          ctx.lineTo(x_lens1, cy); // ≈«i\I√
+          ctx.lineTo(x_field_stop, cy + h_img); // «-ÙœÔ
+          ctx.lineTo(x_lens2, y_lens2_chief);
+          ctx.lineTo(x_pupil, cy); // ≈«˙≥It§π
+          // ˙p
+          if (!isProjectionMode) {
+            const exitSlope = (cy - y_lens2_chief) / (x_pupil - x_lens2);
+            ctx.lineTo(x_proj_end, cy + exitSlope * (x_proj_end - x_pupil));
+          } else {
+            // 3m ïqGZéÕ>'ûœÔ
+            ctx.lineTo(x_proj_end, cy - 65);
+          }
+          ctx.stroke();
+        
+          // C. π∆:‹I_ (S∞‡U„Ñ De  B) - YƒZø
+          ctx.strokeStyle = 'rgba(251, 191, 36, 0.45)';
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.moveTo(x_obj, cy - h_obj);
+          ctx.lineTo(x_lens1, cy - r1);
+          ctx.lineTo(x_field_stop, cy + h_img);
+          ctx.lineTo(x_lens2, cy + (De/2)*scaleY * 0.65);
+          ctx.stroke();
+        
+          ctx.beginPath();
+          ctx.moveTo(x_obj, cy - h_obj);
+          ctx.lineTo(x_lens1, cy + r1);
+          ctx.lineTo(x_field_stop, cy + h_img);
+          ctx.lineTo(x_lens2, cy - (De/2)*scaleY * 0.65);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        
+          // 7. ›ª:¯Ëø
+          drawDimLine(ctx, x_obj, x_lens1, cy + 90, `|lo|=${Math.abs(lo).toFixed(1)}`);
+          drawDimLine(ctx, x_lens1, x_field_stop, cy + 90, `lo'=${lo_prime.toFixed(1)}`);
+          drawDimLine(ctx, x_field_stop, x_lens2, cy + 115, `fe'=${fe_prime.toFixed(1)}`);
+          drawDimLine(ctx, x_lens2, x_pupil, cy + 90, `lp'=${lp_prime.toFixed(1)}`);
+        
+          if (isProjectionMode) {
+            drawText(ctx, `3m ïqOMn ∂`, x_proj_end, cy - 80, '#4ade80', 'right');
+          }
+        }
+        
+        // ÿ˛Ö©¯\&˜
+        function drawLens(ctx, x, cy, h, label) {
+          ctx.strokeStyle = '#64748b';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(x, cy - h);
+          ctx.lineTo(x, cy + h);
+          ctx.stroke();
+        
+          // 
+≠4„hc\
+          const arrow = 6;
+          ctx.beginPath();
+          ctx.moveTo(x - arrow, cy - h + arrow);
+          ctx.lineTo(x, cy - h);
+          ctx.lineTo(x + arrow, cy - h + arrow);
+          ctx.moveTo(x - arrow, cy + h - arrow);
+          ctx.lineTo(x, cy + h);
+          ctx.lineTo(x + arrow, cy + h - arrow);
+          ctx.stroke();
+        
+          const lines = label.split('\n');
+          lines.forEach((line, idx) => {
+            drawText(ctx, line, x, cy - h - 18 + (idx * 14), '#cbd5e1', 'center');
+          });
+        }
+        
+        // ÿ˛Ö©‚œ≠4
+        function drawArrow(ctx, fx, fy, tx, ty, color, width) {
+          ctx.save();
+          ctx.strokeStyle = color;
+          ctx.fillStyle = color;
+          ctx.lineWidth = width;
+          const headlen = 7;
+          const angle = Math.atan2(ty - fy, tx - fx);
+          ctx.beginPath();
+          ctx.moveTo(fx, fy);
+          ctx.lineTo(tx, ty);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.lineTo(tx - headlen * Math.cos(angle - Math.PI / 6), ty - headlen * Math.sin(angle - Math.PI / 6));
+          ctx.lineTo(tx, ty);
+          ctx.lineTo(tx - headlen * Math.cos(angle + Math.PI / 6), ty - headlen * Math.sin(angle + Math.PI / 6));
+          ctx.stroke();
+          ctx.restore();
+        }
+        
+        // ÿ˛Ö©Ã:¯Ë
+        function drawDimLine(ctx, x1, x2, y, text) {
+          if (Math.abs(x2 - x1) < 12) return;
+          ctx.save();
+          ctx.strokeStyle = '#475569';
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '11px monospace';
+          ctx.beginPath();
+          ctx.moveTo(x1, y); ctx.lineTo(x2, y);
+          ctx.moveTo(x1, y - 4); ctx.lineTo(x1, y + 4);
+          ctx.moveTo(x2, y - 4); ctx.lineTo(x2, y + 4);
+          ctx.stroke();
+          ctx.textAlign = 'center';
+          ctx.fillText(text, (x1 + x2) / 2, y - 4);
+          ctx.restore();
+        }
+        
+        function drawText(ctx, txt, x, y, col = '#cbd5e1', align = 'left') {
+          ctx.save();
+          ctx.font = '11px -apple-system, sans-serif';
+          ctx.fillStyle = col;
+          ctx.textAlign = align;
+          ctx.fillText(txt, x, y);
+          ctx.restore();
+        }
+        
+        // ÀgL
+        resizeCanvas();
+        update();
+    </script>
+</body>
+
+</html>
